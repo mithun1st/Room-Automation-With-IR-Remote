@@ -83,6 +83,8 @@ void loop() {
       irrecv.resume();
     }
     manualWithIr();
+//    Serial.println((String)"auto="+digitalRead(swi)+"\tm1="+digitalRead(rs1)+"\tm2="+digitalRead(rs2)+"\tm=3"+digitalRead(rs3));
+//    Serial.println((String)"relay1="+r1+"\trelay2="+r2+"\trelay3="+r3);
   }
 
   //manual mode on
