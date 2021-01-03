@@ -11,7 +11,6 @@
 */
 
 
-
 #define buz 13
 #define IRpin 2
 
@@ -83,8 +82,8 @@ void loop() {
       irrecv.resume();
     }
     manualWithIr();
-//    Serial.println((String)"auto="+digitalRead(swi)+"\tm1="+digitalRead(rs1)+"\tm2="+digitalRead(rs2)+"\tm=3"+digitalRead(rs3));
-//    Serial.println((String)"relay1="+r1+"\trelay2="+r2+"\trelay3="+r3);
+    //    Serial.println((String)"auto="+digitalRead(swi)+"\tm1="+digitalRead(rs1)+"\tm2="+digitalRead(rs2)+"\tm=3"+digitalRead(rs3));
+    //    Serial.println((String)"relay1="+r1+"\trelay2="+r2+"\trelay3="+r3);
   }
 
   //manual mode on
@@ -168,7 +167,7 @@ void disableMode() {
 void buttonFunctionMode() {
 
   //enter (system test)
-  if (results.value == 0xFF02FD) {
+  if (results.value == 0xFF02FD || results.value == 0x25) {
     buzzer(100, true);
     delay(100);
     buzzer(100, true);
@@ -180,7 +179,7 @@ void buttonFunctionMode() {
   //numbers-------------------------
 
   //button(fan speed state) 0
-  else if (results.value == 0xFFB04F) {
+  else if (results.value == 0xFFB04F || results.value == 0x0) {
     for (int i = 0; i < fanSpeed; i++) {
       buzzer(70, bs);
       delay(130);
@@ -188,99 +187,108 @@ void buttonFunctionMode() {
   }
 
   // button(on/off) 1
-  else if (results.value == 0xFF30CF) {
+  else if (results.value == 0xFF30CF || results.value == 0x1) {
     r1 = !r1;
     digitalWrite(relay1, r1);
     if (eeprom) {
       EEPROM.update(1, r1);
     }
     buzzer(50, bs);
+    delay(100);
   }
 
   // button(on/off) 2
-  else if (results.value == 0xFF18E7) {
+  else if (results.value == 0xFF18E7 || results.value == 0x2) {
     r2 = !r2;
     digitalWrite(relay2, r2);
     if (eeprom) {
       EEPROM.update(2, r2);
     }
     buzzer(50, bs);
+    delay(100);
   }
 
   //button(on/off) 3
-  else if (results.value == 0xFF7A85) {
+  else if (results.value == 0xFF7A85 || results.value == 0x3) {
     r3 = !r3;
     digitalWrite(relay3, r3);
     if (eeprom) {
       EEPROM.update(3, r3);
     }
     buzzer(50, bs);
+    delay(100);
   }
 
   // button(on) 4
-  else if (results.value == 0xFF10EF) {
+  else if (results.value == 0xFF10EF || results.value == 0x4) {
     if (eeprom && !r1) {
       EEPROM.update(1, true);
     }
     r1 = true;
     digitalWrite(relay1, r1);
     buzzer(50, bs);
+    delay(100);
   }
 
   // button(on) 5
-  else if (results.value == 0xFF38C7) {
+  else if (results.value == 0xFF38C7 || results.value == 0x5) {
     if (eeprom && !r2) {
       EEPROM.update(2, true);
     }
     r2 = true;
     digitalWrite(relay2, r2);
     buzzer(50, bs);
+    delay(100);
   }
 
   //button(on) 6
-  else if (results.value == 0xFF5AA5) {
+  else if (results.value == 0xFF5AA5 || results.value == 0x6) {
     if (eeprom && !r3) {
       EEPROM.update(3, true);
     }
     r3 = true;
     digitalWrite(relay3, r3);
     buzzer(50, bs);
+    delay(100);
   }
 
   // button(off) 7
-  else if (results.value == 0xFF42BD) {
+  else if (results.value == 0xFF42BD || results.value == 0x7) {
     if (eeprom && r1) {
       EEPROM.update(1, false);
     }
     r1 = false;
     digitalWrite(relay1, r1);
     buzzer(50, bs);
+    delay(100);
   }
 
   // button(off) 8
-  else if (results.value == 0xFF4AB5) {
+  else if (results.value == 0xFF4AB5 || results.value == 0x8) {
     if (eeprom && r2) {
       EEPROM.update(2, false);
     }
     r2 = false;
     digitalWrite(relay2, r2);
     buzzer(50, bs);
+    delay(100);
   }
 
   //button(off) 9
-  else if (results.value == 0xFF52AD) {
+  else if (results.value == 0xFF52AD || results.value == 0x9) {
     if (eeprom && r3) {
       EEPROM.update(3, false);
     }
     r3 = false;
     digitalWrite(relay3, r3);
     buzzer(50, bs);
+    delay(100);
   }
   //numbers end-----------------------
 
 
   //vol- (fanSpeed)
-  else if (results.value == 0xFF6897) {
+  else if (results.value == 0xFF6897 || results.value == 0x11) {
     fanSpeed--;
     if (fanSpeed < 1) {
       fanSpeed = 1;
@@ -296,7 +304,7 @@ void buttonFunctionMode() {
   }
 
   //vol+ (fanSpeed)
-  else if (results.value == 0xFF9867) {
+  else if (results.value == 0xFF9867 || results.value == 0x10) {
     fanSpeed++;
     if (fanSpeed > 4) {
       fanSpeed = 4;
@@ -312,8 +320,8 @@ void buttonFunctionMode() {
   }
 
 
-  //power (all relay on)
-  else if (results.value == 0xFFA25D) {
+  //power (all relay off)
+  else if (results.value == 0xFFA25D || results.value == 0xC) {
     if (r1 || r2 || r3) {
       r1 = false;
       r2 = false;
@@ -327,28 +335,35 @@ void buttonFunctionMode() {
         EEPROM.update(2, r2);
         EEPROM.update(3, r3);
       }
-
       buzzer(50, bs);
+      delay(100);
     }
   }
 
 
   //stop (temporary light)
   else if (results.value == 0xFF629D) {
+
+    if (eeprom && r1) {
+      EEPROM.update(1, false);
+    }
+
     r1 = true;
     buzzer(50, bs);
     digitalWrite(relay1, r1);
 
-    delay(5000);
+    delay(7000);
 
     r1 = false;
     buzzer(50, bs);
     digitalWrite(relay1, r1);
+
+    delay(100);
   }
 
 
   //mute (buzzer on/off)
-  else if (results.value == 0xFFE21D) {
+  else if (results.value == 0xFFE21D || results.value == 0xD) {
     bs = !bs;
 
     if (eeprom) {
@@ -401,6 +416,7 @@ void manualWithIr() {
       r1 = false;
     }
     digitalWrite(relay1, r1);
+    delay(100);
     if (eeprom) {
       EEPROM.update(1, r1);
     }
@@ -416,6 +432,7 @@ void manualWithIr() {
       r2 = false;
     }
     digitalWrite(relay2, r2);
+    delay(100);
     if (eeprom) {
       EEPROM.update(2, r2);
     }
@@ -431,6 +448,7 @@ void manualWithIr() {
       r3 = false;
     }
     digitalWrite(relay3, r3);
+    delay(100);
     if (eeprom) {
       EEPROM.update(3, r3);
     }
@@ -444,11 +462,13 @@ void manualWithoutIr() {
   if (digitalRead(rs1) && !r1) {
     r1 = true;
     digitalWrite(relay1, r1);
+    delay(100);
     buzzer(50, bs);
   }
   else if (!digitalRead(rs1) && r1) {
     r1 = false;
     digitalWrite(relay1, r1);
+    delay(100);
     buzzer(50, bs);
   }
 
@@ -456,11 +476,13 @@ void manualWithoutIr() {
   if (digitalRead(rs2) && !r2) {
     r2 = true;
     digitalWrite(relay2, r2);
+    delay(100);
     buzzer(50, bs);
   }
   else if (!digitalRead(rs2) && r2) {
     r2 = false;
     digitalWrite(relay2, r2);
+    delay(100);
     buzzer(50, bs);
   }
 
@@ -468,11 +490,13 @@ void manualWithoutIr() {
   if (digitalRead(rs3) && !r3) {
     r3 = true;
     digitalWrite(relay3, r3);
+    delay(100);
     buzzer(50, bs);
   }
   else if (!digitalRead(rs3) && r3) {
     r3 = false;
     digitalWrite(relay3, r3);
+    delay(100);
     buzzer(50, bs);
   }
 
