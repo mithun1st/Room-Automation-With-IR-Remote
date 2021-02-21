@@ -416,7 +416,7 @@ void manualWithIr() {
       r1 = false;
     }
     digitalWrite(relay1, r1);
-    delay(100);
+    delay(200);
     if (eeprom) {
       EEPROM.update(1, r1);
     }
@@ -432,7 +432,7 @@ void manualWithIr() {
       r2 = false;
     }
     digitalWrite(relay2, r2);
-    delay(100);
+    delay(200);
     if (eeprom) {
       EEPROM.update(2, r2);
     }
@@ -448,7 +448,7 @@ void manualWithIr() {
       r3 = false;
     }
     digitalWrite(relay3, r3);
-    delay(100);
+    delay(200);
     if (eeprom) {
       EEPROM.update(3, r3);
     }
